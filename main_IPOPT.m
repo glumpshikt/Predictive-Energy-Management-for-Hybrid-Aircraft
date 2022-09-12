@@ -1,4 +1,3 @@
-
 %% Energy management for hybrid electric aircraft
 % Optimise the power split between the gas turbine and
 % electric motor of a parallel hybrid propulsion system to meet the drive
@@ -14,7 +13,7 @@ clear; close all; clc;
 %% Solver parameters
 open_circuit_deg = 2;       % 0: Constant, >0: number of deg of polynomial
 resistance_deg = 2;         % 0: Constant, >0: number of deg of polynomial
-tag = 'bigE-const';          % file tag
+tag = '';                   % file tag
 savecsv = false;            % saves data to csv if true
 d = 24;                     % sample time (s)
 T = 3600;                   % duration of flight (s)
@@ -23,9 +22,9 @@ T = 3600;                   % duration of flight (s)
 n_mot = 4;                  % number of propulsion systems
 m_bat = 8000;               % battery mass for all systems (kg)
 dens = 0.875;               % battery density (MJ/kg)
-SOC_max = 1.0322e4;             % max battery stored energy per system (MJ)
-R_max = 7.1667e-3;             % battery eqvl circuit resistance (ohm)
-U_max = 796.4675;                % battery maximum open circuit voltage (V)
+SOC_max = 1.0322e4;         % max battery stored energy per system (MJ)
+R_max = 7.1667e-3;          % battery eqvl circuit resistance (ohm)
+U_max = 796.4675;            % battery maximum open circuit voltage (V)
 m_fuel_0 = 4000;            % initial fuel mass (kg)
 E_low = 0.2*SOC_max;        % lower bound on battery energy per system (MJ)
 E_up = 0.85*SOC_max;        % upper bound on battery energy per system (MJ)
@@ -224,6 +223,12 @@ figure
 hold on
 plot(t, P_drv)
 plot(t, P_em)
+legend('$P_{drv}$', '$P_{em}$','interpreter', 'latex')
+xlim([0, 3600])
+ylabel('Power (MW)', 'interpreter', 'latex')
+xlabel('time (s)', 'interpreter', 'latex')
+set(gca,'TickLabelInterpreter','latex')
+grid on
 hold off
 
 function o = objective(x, auxdata)
