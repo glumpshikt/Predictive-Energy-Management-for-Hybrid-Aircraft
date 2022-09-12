@@ -4,7 +4,7 @@
 % power demand for a given flight profile. Open loop implementation of the
 % energy management algorithm in the paper "Predictive energy management
 % for hybrid electric aircraft propulsion systems".
-%
+
 clear; close all; clc;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -22,10 +22,9 @@ T = 3600;                   % duration of flight (s)
 n_mot = 4;                  % number of propulsion systems
 m_bat = 8000;               % battery mass for all systems (kg)
 dens = 0.875;               % battery density (MJ/kg)
-SOC_max = 1.0322e4;         % max battery stored energy per system (MJ)
-R_max = 7.1667e-3;          % battery eqvl circuit resistance (ohm)
-U_max = 796.4675;            % battery maximum open circuit voltage (V)
-m_fuel_0 = 4000;            % initial fuel mass (kg)
+SOC_max = dens*m_bat/n_mot; % max battery stored energy per system (MJ)
+R_max = 3.5e-2;             % battery eqvl circuit resistance (ohm)
+U_max = 800;                % battery maximum open circuit voltage (V)
 E_low = 0.2*SOC_max;        % lower bound on battery energy per system (MJ)
 E_up = 0.85*SOC_max;        % upper bound on battery energy per system (MJ)
 P_em_low = 0;               % lower bound on e.m. power per shaft (MW)
@@ -34,7 +33,7 @@ P_gt_low = 0;               % lower bound on gas turbine power (MW)
 P_gt_up = 5;                % upper bound on gas turbine power (MW)
 compCl = [0.11 0.43];       % lift coefficients: [b0(-); b1(deg^-1)]
 compCd = [0.0282 0.0042...
-    5.3613e-04];  % drag coeff.: [a0(-); a1(deg^-1); a2(deg^-2)]
+    5.3613e-04];            % drag coeff.: [a0(-); a1(deg^-1); a2(deg^-2)]
 initTAS = 131.9263;         % initial true airspeed (m/s)
 g = 9.81;                   % acceleration due to gravity (m/s^2)
 S = 77.3;                   % characteristic surface area (m^2)
@@ -78,14 +77,14 @@ Phi = ones(length(t), 1);
 
 % Get drive power coeff. in P_drv = eta(:,1).*m.^2 + eta(:,2).*m + eta(:,3)
 [eta2, eta1, eta0] = f_drv(v, v_dot, gamma, gamma_dot, compCd, compCl,...
-    g, S, rho_air); % (MW per shaft)
+    g, S, rho_air);                     % (MW per shaft)
 eta = [eta2, eta1, eta0];
 
 % gt fuel coeff. in ph = beta1*Peng + beta0 (1st order fit)
-beta = [0.0821 0.0327].*ones(N, 2); %  (beta = [beta1; beta0])
+beta = [0.0821 0.0327].*ones(N, 2);     % (beta = [beta1; beta0])
 
 % e.m. loss map coeff. in Pc = alpha2*P_gt^2 + alpha1*P_gt + alpha0
-alpha = [0 1 0].*ones(N, 3); %  (alpha = [alpha2; alpha1; alpha0])
+alpha = [0 1 0].*ones(N, 3);            % (alpha = [alpha2; alpha1; alpha0])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%% Power constraints %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -121,12 +120,14 @@ R_scale = R_max;
 voc = readmatrix('data/Voc_normalised.csv');
 R = readmatrix('data/Rbat_normalised.csv');
 
+% get polynomial coefficients for v_oc
 if open_circuit_deg == 0
     v_coeff = 1;
 else
     v_coeff = polyfit(voc(:,1), voc(:,2), open_circuit_deg);
 end
 
+% get polynomial coefficients for R
 if resistance_deg == 0
     r_coeff = 1;
 else
@@ -135,7 +136,7 @@ end
 
 clear voc R;
 
-%% Initialise values via cvx
+%% Initialise values for IPOPT
 E_0 = E_up*Phi/E_scale;
 U_0 = U_max*Phi/U_scale;
 m_0 = M*Phi/M_scale;
@@ -178,6 +179,7 @@ options.auxdata = {N, alpha, beta, eta, U_max, R_max, SOC_max, ... %(1-7)
     M, E_up, P_em_up, v_coeff, r_coeff, d, n_mot, ...              %(8-14)
     E_scale, U_scale, P_b_scale, phi_scale, M_scale, R_scale, ...  %(15-20)
     P_em_low};
+
 %% Run IPOPT.
 [x, info] = ipopt_auxdata(x0,funcs,options);
 
