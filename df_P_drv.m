@@ -1,5 +1,5 @@
 function out = df_P_drv(m, eta)
-% Function: Compute P_drv map (Total Power Requirement map)
+% Function: Compute derivative of P_drv map (Total Power Requirement map)
 % Input: 
 %        - m: mass (kg)
 %        - eta (map coefficients)

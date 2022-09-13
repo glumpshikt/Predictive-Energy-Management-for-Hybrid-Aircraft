@@ -1,3 +1,5 @@
+%% jacobian sparse for IPOPT
+
 function g = jacobiansparse(auxdata)
 N = cell2mat(auxdata(1));
 I = speye(N);

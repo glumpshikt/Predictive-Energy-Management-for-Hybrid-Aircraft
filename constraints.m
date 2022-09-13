@@ -1,3 +1,5 @@
+%% constraint function for IPOPT
+
 function c = constraints(x, auxdata)
 N = cell2mat(auxdata(1));
 alpha = cell2mat(auxdata(2));

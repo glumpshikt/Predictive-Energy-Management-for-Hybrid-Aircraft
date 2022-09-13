@@ -1,3 +1,5 @@
+%% jacobian for IPOPT
+
 function j = jacobian(x, auxdata)
 N = cell2mat(auxdata(1));
 alpha = cell2mat(auxdata(2));

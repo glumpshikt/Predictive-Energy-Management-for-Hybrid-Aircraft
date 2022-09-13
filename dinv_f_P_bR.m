@@ -1,4 +1,5 @@
 function out = dinv_f_P_bR(P_b, ~, U)
+% Function: Compute partial derivative of dinv_f_P_b with respect to R
 % Input:  
 %         - P_c: effective electrical power (MW)
 %         - R: Battery internal resistance (Ohms)
