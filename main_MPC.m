@@ -1,6 +1,8 @@
-%% Shrinking Horizon Optimisation for K>1
-% Constants
-clc; clear;
+%% Model Predictive Control for Predictive Energy Management of Hybrid Aircraft
+clear; close all; clc;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 n_mot = 4;                          % number of propulsion systems
 m_bat = 8000;                       % battery mass for all systems (kg)
 dens = 0.875;                       % battery density (MJ/kg)
@@ -22,6 +24,10 @@ R = readmatrix('data/Rbat_normalised.csv');
 U_coeff = U_max*polyfit(voc(:,1), voc(:,2), 2);
 R_coeff = R_max*polyfit(R(:,1), R(:,2), 2);
 clear voc R;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Initialisation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Generating noise
 var_w = 2e-5;                                  % SOC process noise variance
@@ -52,7 +58,10 @@ E_true(1,:) = E(1,:) + w(N,:);
 m(1,:) = 42000*ones(1,L);
 x=0;
 
-%% Stepping through time
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%% Stepping Through Time %%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 for l=1:L
     for i=1:N-1
         % generate K noise samples of length N-i+1
@@ -91,6 +100,9 @@ for l=1:L
     end
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%% Writing Files to csv %%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if savecsv == true 
     filenamem = strcat('data\m_MPC_',tag,'.csv');
     filenameE = strcat('data\E_MPC_',tag,'.csv');

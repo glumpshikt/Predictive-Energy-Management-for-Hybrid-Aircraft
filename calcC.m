@@ -1,6 +1,13 @@
-% Calculate matrix of partial h/ partial SOC
-
 function C = calcC(SOC, P_c, U_coeff, R_coeff)
+% Function: Compute partial derivative of the measurement function h with
+% respect to SOC
+% Input: 
+%        - SOC: state of charge (dimensionless)
+%        - P_c: power demand of electric motor (W)
+%        - SOC_max: maximum state of charge (J)
+%        - U_coeff/R_coeff: polynomial coefficients for open-circuit
+%        voltage, battery internal resistance
+% Output: partial h/ partial SOC
 
 U = polyval(U_coeff, SOC);
 dU = polyval(polyder(U_coeff),SOC);
